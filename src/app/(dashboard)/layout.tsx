@@ -28,10 +28,10 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
               Dashboard
             </a>
             <a
-              href="/dashboard/communities"
+              href="/dashboard/projects"
               className="text-muted-foreground hover:text-foreground"
             >
-              Communities
+              Projects
             </a>
           </nav>
           <div className="flex items-center gap-4">
