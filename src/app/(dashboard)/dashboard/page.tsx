@@ -1,11 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/core/supabase/server";
+import { getProjectCount } from "@/features/projects";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const projectCount = user ? await getProjectCount(user.id) : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,16 +47,22 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Communities</CardTitle>
-            <CardDescription>Your communities</CardDescription>
+            <CardTitle>Projects</CardTitle>
+            <CardDescription>Your projects</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">No communities yet.</p>
+            {projectCount > 0 ? (
+              <p className="text-sm text-muted-foreground">
+                You have {projectCount} project{projectCount === 1 ? "" : "s"}.
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">No projects yet.</p>
+            )}
             <a
-              href="/dashboard/communities"
+              href="/dashboard/projects"
               className="mt-4 inline-block text-sm text-primary hover:underline"
             >
-              Browse communities &rarr;
+              Manage projects &rarr;
             </a>
           </CardContent>
         </Card>
