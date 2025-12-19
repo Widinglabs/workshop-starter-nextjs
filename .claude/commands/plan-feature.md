@@ -283,8 +283,23 @@ bun test {specific-pattern}
 bun test && bun run build
 ```
 
-### Level 4: Manual Validation
-{specific steps to manually verify feature works}
+### Level 4: Database Validation (Supabase MCP)
+{Use Supabase MCP to verify:}
+- Schema changes applied correctly
+- RLS policies in place
+- Data migrations successful
+- Indexes created as expected
+
+### Level 5: Browser Validation (Browser MCP)
+{Use Browser MCP to verify:}
+- UI renders correctly
+- User flows work end-to-end
+- Forms submit and validate
+- Error states display properly
+- Responsive behavior on different viewports
+
+### Level 6: Manual Validation
+{Additional manual steps if MCP validation insufficient}
 
 ---
 
@@ -303,11 +318,12 @@ bun test && bun run build
 
 - [ ] All tasks completed in order
 - [ ] Each task validated immediately after
-- [ ] `bun run lint` passes
-- [ ] `npx tsc --noEmit` passes
-- [ ] `bun test` passes
-- [ ] `bun run build` succeeds
-- [ ] Manual testing confirms feature
+- [ ] Level 1: `bun run lint && npx tsc --noEmit` passes
+- [ ] Level 2: `bun test {pattern}` passes
+- [ ] Level 3: `bun test && bun run build` succeeds
+- [ ] Level 4: Supabase MCP validation passes (if DB changes)
+- [ ] Level 5: Browser MCP validation passes (if UI changes)
+- [ ] Level 6: Manual validation confirms feature
 - [ ] All acceptance criteria met
 
 ---
