@@ -11,8 +11,8 @@ Read these files to understand the codebase before starting work:
 4. `biome.json` - Linting rules
 5. `src/core/database/schema.ts` - Database schema
 6. `src/core/supabase/server.ts` - Server-side Supabase client
-7. `src/core/supabase/client.ts` - Browser-side Supabase client
-8. `src/core/supabase/proxy.ts` - Middleware for session refresh
+7. `src/core/logging/index.ts` - Structured logging with getLogger()
+8. `src/shared/index.ts` - Shared utilities (pagination, errors, dates)
 
 Then run:
 ```bash
