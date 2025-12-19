@@ -51,7 +51,8 @@
       "complexity": {
         "recommended": true,
         "noExcessiveCognitiveComplexity": "warn",
-        "noForEach": "warn"
+        "noForEach": "warn",
+        "useLiteralKeys": "off"
       }
     }
   },

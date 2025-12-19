@@ -126,8 +126,6 @@ bun run db:studio    # Open Drizzle Studio GUI
    postgres(url, { prepare: false })
    ```
 
-5. **TypeScript + Biome conflict**: `noPropertyAccessFromIndexSignature` requires `process.env["KEY"]` but Biome suggests `process.env.KEY`. Use `biome-ignore` comments for `process.env` access.
-
 ## shadcn/ui Components
 
 Components are copied into `src/components/ui/` - you can read and modify them directly.

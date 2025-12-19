@@ -15,9 +15,7 @@ function getOptionalEnv(key: string, defaultValue: string): string {
  * Supports both legacy ANON_KEY and new PUBLISHABLE_KEY naming.
  */
 function getSupabaseKey(): string {
-  // biome-ignore lint/complexity/useLiteralKeys: TypeScript noPropertyAccessFromIndexSignature requires bracket notation
   const publishableKey = process.env["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"];
-  // biome-ignore lint/complexity/useLiteralKeys: TypeScript noPropertyAccessFromIndexSignature requires bracket notation
   const anonKey = process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"];
 
   const key = publishableKey ?? anonKey;
