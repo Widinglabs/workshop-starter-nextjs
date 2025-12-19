@@ -141,7 +141,7 @@ AFTER:
 
 ## Phase 6: Generate Implementation Plan
 
-**Save to**: `.claude/plans/{feature-name}.plan.md`
+**Save to**: `.agents/plans/{feature-name}.plan.md`
 
 **Plan structure:**
 
@@ -367,7 +367,7 @@ bun test && bun run build
 </process>
 
 <output>
-**File created**: `.claude/plans/{feature-name}.plan.md`
+**File created**: `.agents/plans/{feature-name}.plan.md`
 
 **Report to user:**
 - Summary of feature and approach
@@ -375,7 +375,7 @@ bun test && bun run build
 - Complexity assessment
 - Key risks or considerations
 - Confidence score (1-10) for one-pass implementation success
-- Next step: "To implement, run: `/implement .claude/plans/{feature-name}.plan.md`"
+- Next step: "To implement, run: `/implement .agents/plans/{feature-name}.plan.md`"
 </output>
 
 <verification>
