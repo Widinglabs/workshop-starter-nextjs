@@ -1,27 +1,42 @@
 ---
-description: Deep root cause analysis - finds the actual cause, not just symptoms
-argument-hint: <issue|error|stacktrace> [quick]
+agent: 'agent'
+description: 'Deep root cause analysis - finds the actual cause, not just symptoms'
 ---
 
-<objective>
-Find the **actual root cause** of: $ARGUMENTS
+# Deep Root Cause Analysis
+
+## First: Get Input
+
+**Ask the user**: "What issue, error, or problem do you need me to analyze?
+
+Please provide:
+1. The issue/error/stacktrace
+2. Mode: 'quick' for surface scan (2-3 Whys) or leave empty for deep analysis (5+ Whys with git history)"
+
+Store the issue as `ISSUE_TO_ANALYZE` and the mode as `ANALYSIS_MODE`.
+
+---
+
+## Objective
+
+Find the **actual root cause** of `ISSUE_TO_ANALYZE`.
 
 Not symptoms. Not intermediate failures. The specific code, config, or logic that, if changed, would prevent this issue.
 
 **The Test**: "If I changed THIS, would the issue be prevented?" If the answer is "maybe" or "partially", keep digging.
 
-**Mode**: If input ends with "quick" → surface scan (2-3 Whys). Otherwise → deep analysis (5+ Whys with git history).
-</objective>
+**Mode**: If `ANALYSIS_MODE` is "quick" → surface scan (2-3 Whys). Otherwise → deep analysis (5+ Whys with git history).
 
-<context>
-Project structure: !`ls -la src/`
-Recent commits: !`git log --oneline -10`
-Current branch: !`git branch --show-current`
-</context>
+## Context
 
-<process>
+Run these commands to understand current state:
+- `ls -la src/` - Project structure
+- `git log --oneline -10` - Recent commits
+- `git branch --show-current` - Current branch
 
-## Phase 1: CLASSIFY - Parse the Input
+## Process
+
+### Phase 1: CLASSIFY - Parse the Input
 
 **Determine input type:**
 
@@ -40,7 +55,7 @@ Current branch: !`git branch --show-current`
 
 ---
 
-## Phase 2: HYPOTHESIZE - Generate Candidates
+### Phase 2: HYPOTHESIZE - Generate Candidates
 
 **Form 2-4 hypotheses** about what could cause this:
 
@@ -53,7 +68,7 @@ Current branch: !`git branch --show-current`
 
 ---
 
-## Phase 3: INVESTIGATE - The 5 Whys
+### Phase 3: INVESTIGATE - The 5 Whys
 
 Execute 5 Whys on your leading hypothesis:
 
@@ -86,6 +101,7 @@ WHY 5: Why does [cause D] happen?
 - If dead end, backtrack and try alternative branches
 
 **EVIDENCE_STANDARDS (STRICT):**
+
 | Valid | Invalid |
 |-------|---------|
 | `file.ts:123` with actual code snippet | "likely includes...", "probably because..." |
@@ -98,7 +114,7 @@ WHY 5: Why does [cause D] happen?
 
 ---
 
-## Phase 4: VALIDATE - Confirm Root Cause
+### Phase 4: VALIDATE - Confirm Root Cause
 
 Before declaring victory, verify:
 
@@ -112,9 +128,9 @@ If any test fails → root cause is incomplete. Go deeper or broader.
 
 ---
 
-## Mode-Specific Behavior
+### Mode-Specific Behavior
 
-**QUICK mode** (input ends with "quick"):
+**QUICK mode** (if `ANALYSIS_MODE` is "quick"):
 - Limit to 2-3 Whys
 - Accept high-confidence hypotheses without exhaustive validation
 - Focus on single most likely path
@@ -129,23 +145,7 @@ If any test fails → root cause is incomplete. Go deeper or broader.
 
 ---
 
-## Investigation Techniques
-
-**CRITICAL: Test, Don't Just Read**
-
-Reading code = what it's supposed to do
-Running code = what it actually does
-
-| Issue Type | Techniques |
-|------------|------------|
-| Code bugs | Grep error messages, read full context, git blame, find working patterns elsewhere, **run with edge inputs** |
-| Runtime issues | Check env/config, initialization order, race conditions, error handling |
-| Integration issues | Trace data flow across boundaries, check type mismatches, verify assumptions |
-| Regressions | `git log --oneline -20`, `git diff HEAD~10`, mental git bisect |
-
----
-
-## Git History Analysis (DEEP mode only)
+### Git History Analysis (DEEP mode only)
 
 **REQUIRED** - Run these commands on affected files:
 
@@ -167,7 +167,7 @@ git diff HEAD~10 -- <affected-file>
 
 ---
 
-## Phase 5: GENERATE - Output Report
+### Phase 5: GENERATE - Output Report
 
 **Create directory**: `mkdir -p .agents/rca`
 
@@ -175,9 +175,10 @@ git diff HEAD~10 -- <affected-file>
 
 **Save to**: `.agents/rca/rca-report-{N}.md`
 
-</process>
+---
 
-<output>
+## Output
+
 **OUTPUT_FILE**: `.agents/rca/rca-report-{N}.md`
 
 **REPORT_STRUCTURE**:
@@ -234,25 +235,17 @@ WHY: [First level cause]
 
 ### Implementation Guidance
 
-```typescript
 // CURRENT (problematic):
 [simplified example of what's wrong]
 
 // REQUIRED (correct):
 [simplified example of correct pattern]
-```
 
 ### Key Considerations
 
 - [Edge case or constraint]
 - [Related code that might need updates]
 - [Testing approach]
-
-### Files to Examine
-
-| File | Lines | Why |
-|------|-------|-----|
-| `path/to/file.ts` | 10-50 | [reason] |
 
 ---
 
@@ -272,26 +265,11 @@ File: .agents/rca/rca-report-{N}.md
 Root Cause: [one-line summary]
 Confidence: [High/Medium/Low]
 Severity: [Critical/High/Medium/Low]
-
-To fix: /fix-rca .agents/rca/rca-report-{N}.md
 ```
-</output>
 
-<verification>
-Before finalizing report:
+## Success Criteria
 
-- [ ] Root cause points to specific, changeable code (not vague concept)
-- [ ] Every "BECAUSE" has concrete evidence with file:line
-- [ ] No speculation words: "likely", "probably", "may", "might"
-- [ ] Git history included (deep mode)
-- [ ] At least one hypothesis tested with execution (deep mode)
-- [ ] Fix specification is actionable
-- [ ] Verification steps are executable
-</verification>
-
-<success_criteria>
-**CAUSE_IDENTIFIED**: Root cause points to exact code/config that needs change
-**EVIDENCE_BACKED**: Every step in chain has proof (not speculation)
-**ACTIONABLE_FIX**: Fix specification enables immediate implementation
-**TESTABLE**: Verification steps can confirm the fix works
-</success_criteria>
+- **CAUSE_IDENTIFIED**: Root cause points to exact code/config that needs change
+- **EVIDENCE_BACKED**: Every step in chain has proof (not speculation)
+- **ACTIONABLE_FIX**: Fix specification enables immediate implementation
+- **TESTABLE**: Verification steps can confirm the fix works
