@@ -1,322 +1,348 @@
 ---
-description: Interactive setup guide - install dependencies, configure env, start server
+description: Interactive setup guide - explores project, confirms steps, then executes
 ---
 
 # Quickstart Setup Guide
 
-Think through each step carefully to ensure nothing is missed.
+---
+
+## Phase 1: EXPLORE - Understand the Project
+
+**Before doing anything, explore the project to understand what's needed.**
+
+### 1.1 Read Project Documentation
+
+```bash
+# Check for README
+cat README.md 2>/dev/null | head -100
+
+# Check for setup docs
+ls docs/ 2>/dev/null
+cat docs/SETUP.md 2>/dev/null || cat docs/setup.md 2>/dev/null
+```
+
+### 1.2 Analyze Package Configuration
+
+```bash
+# Package manager and scripts
+cat package.json | head -50
+
+# Check which package manager
+ls bun.lockb 2>/dev/null && echo "USES_BUN"
+ls package-lock.json 2>/dev/null && echo "USES_NPM"
+ls yarn.lock 2>/dev/null && echo "USES_YARN"
+ls pnpm-lock.yaml 2>/dev/null && echo "USES_PNPM"
+```
+
+### 1.3 Discover Environment Requirements
+
+```bash
+# Check for env example/template
+cat .env.example 2>/dev/null || cat .env.template 2>/dev/null || cat .env.sample 2>/dev/null
+
+# Check existing env
+ls .env.local 2>/dev/null || ls .env 2>/dev/null
+```
+
+### 1.4 Check Project Structure
+
+```bash
+# Understand the tech stack
+ls -la src/ 2>/dev/null
+ls -la app/ 2>/dev/null
+
+# Database setup files
+ls drizzle.config.* 2>/dev/null
+ls prisma/ 2>/dev/null
+
+# Config files
+ls next.config.* 2>/dev/null
+ls vite.config.* 2>/dev/null
+ls tsconfig.json 2>/dev/null
+```
+
+### 1.5 Read CLAUDE.md for Project Context
+
+Read `CLAUDE.md` if it exists - it contains project-specific setup instructions and patterns.
 
 ---
 
-## Phase 1: CHECK - Current State
+## Phase 2: ANALYZE - Determine Setup Steps
 
-### 1.1 Check Prerequisites
+**Based on exploration, identify:**
+
+1. **Package manager**: Bun / npm / yarn / pnpm
+2. **Required environment variables**: From .env.example
+3. **Optional environment variables**: Defaults available
+4. **Database setup**: Migrations, seeds, schema push
+5. **Build/validation steps**: Type check, lint, test
+6. **Dev server command**: How to start the app
+
+**Categorize env variables:**
+
+| Variable | Required? | Has Default? | Source |
+|----------|-----------|--------------|--------|
+| {VAR_NAME} | Yes/No | Yes/No | {where to get it} |
+
+---
+
+## Phase 3: CONFIRM - Present Plan to User
+
+**Before executing, present the discovered setup plan:**
+
+> **Setup Plan**
+>
+> Based on my exploration of this project, here's what I found:
+>
+> **Tech Stack:**
+> - Framework: {Next.js / Vite / etc.}
+> - Package Manager: {Bun / npm / etc.}
+> - Database: {Supabase / Postgres / etc.}
+>
+> **Setup Steps:**
+> 1. Install dependencies: `{install command}`
+> 2. Configure environment: {N} required variables, {M} optional
+> 3. Database setup: {migrations / schema push / none}
+> 4. Validation: {type check, lint, test}
+> 5. Start server: `{dev command}`
+>
+> **Environment Variables Needed:**
+>
+> | Variable | Required | Where to Get It |
+> |----------|----------|-----------------|
+> | {VAR} | {Yes/No} | {source} |
+>
+> **Does this look correct? Should I proceed?**
+
+**GATE**: Wait for user confirmation before proceeding.
+
+---
+
+## Phase 4: CHECK - Current State
+
+### 4.1 Check Prerequisites
 
 ```bash
-# Check Node/Bun
-bun --version
+# Check runtime version
+{package_manager} --version
 
 # Check if dependencies installed
 ls node_modules 2>/dev/null || echo "NOT_INSTALLED"
 
-# Check if .env.local exists
-ls .env.local 2>/dev/null || echo "NOT_CONFIGURED"
+# Check if env configured
+ls .env.local 2>/dev/null || ls .env 2>/dev/null || echo "NOT_CONFIGURED"
 ```
 
-**Report findings to user:**
-- Bun version: {version}
+**Report findings:**
+- Runtime: {version}
 - Dependencies: Installed / Not installed
 - Environment: Configured / Not configured
 
 ---
 
-## Phase 2: INSTALL - Dependencies
+## Phase 5: INSTALL - Dependencies
 
-### 2.1 Install Dependencies
+Run the appropriate install command based on detected package manager:
 
 ```bash
+# Bun
 bun install
+
+# npm
+npm install
+
+# yarn
+yarn install
+
+# pnpm
+pnpm install
 ```
 
 **If errors occur**, report them and suggest fixes.
 
 ---
 
-## Phase 3: CONFIGURE - Environment Variables
+## Phase 6: CONFIGURE - Environment Variables
 
-### 3.1 Check Existing Configuration
-
-```bash
-cat .env.local 2>/dev/null || echo "No .env.local found"
-```
-
-### 3.2 Explain Required Variables
-
-**Ask the user:**
-
-> **Environment Configuration**
->
-> This project requires Supabase for authentication and database.
->
-> **MANDATORY** (app won't work without these):
->
-> | Variable | Description | Where to get it |
-> |----------|-------------|-----------------|
-> | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API |
-> | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key | Supabase Dashboard → Settings → API |
-> | `DATABASE_URL` | PostgreSQL connection string | Supabase Dashboard → Settings → Database → Connection string (use Transaction pooler, port 6543) |
->
-> **OPTIONAL** (for additional features):
->
-> | Variable | Description | Default |
-> |----------|-------------|---------|
-> | `LOG_LEVEL` | Logging verbosity | `info` |
-> | `NODE_ENV` | Environment mode | `development` |
->
-> **Do you have a Supabase project set up?**
-> - Yes, I have the credentials ready
-> - No, I need to create one first
-> - Skip for now (I'll configure later)
-
-**GATE**: Wait for user response.
-
-### 3.3 Guide Based on Response
-
-**If "Yes, I have credentials":**
-
-> Great! Please provide your Supabase credentials:
->
-> 1. **Supabase URL** (looks like `https://xxxxx.supabase.co`):
-> 2. **Anon Key** (starts with `eyJ...`):
-> 3. **Database URL** (looks like `postgresql://postgres.[ref]:[password]@...`):
->
-> I'll create your `.env.local` file.
-
-**GATE**: Wait for credentials, then create `.env.local`:
+### 6.1 Check Existing Configuration
 
 ```bash
-cat > .env.local << 'EOF'
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL={provided_url}
-NEXT_PUBLIC_SUPABASE_ANON_KEY={provided_key}
-DATABASE_URL={provided_database_url}
-
-# Optional
-LOG_LEVEL=info
-NODE_ENV=development
-EOF
+cat .env.local 2>/dev/null || cat .env 2>/dev/null || echo "No env file found"
 ```
 
-**If "No, I need to create one":**
+### 6.2 Guide Environment Setup
 
-> **Quick Supabase Setup:**
+**For each REQUIRED variable that's missing:**
+
+> **Missing Required Variable: `{VAR_NAME}`**
 >
-> 1. Go to https://supabase.com and sign up/login
-> 2. Click "New Project"
-> 3. Choose organization, name your project, set a database password
-> 4. Wait for project to provision (~2 minutes)
-> 5. Go to Settings → API to get your URL and anon key
-> 6. Go to Settings → Database → Connection string for DATABASE_URL
->    - Use "Transaction pooler" mode (port 6543)
->    - Replace `[YOUR-PASSWORD]` with your database password
+> Description: {what it's for}
+> Format: {expected format, e.g., "URL starting with https://"}
+> Where to get it: {specific instructions}
 >
-> **When ready, run `/quickstart` again with your credentials.**
+> Please provide the value:
 
-**STOP here if user needs to create Supabase project.**
+**For OPTIONAL variables:**
 
-**If "Skip for now":**
-
-> Skipping environment setup. Note: The app will fail to connect to Supabase.
-> Run `/quickstart` again when you have your credentials ready.
-
-**Continue to Phase 4 but warn about missing config.**
-
-### 3.4 Optional Configuration
-
-**Ask the user:**
-
-> **Optional Settings**
+> **Optional Variables**
 >
-> Would you like to configure any optional settings?
+> These have defaults but can be customized:
 >
-> - [ ] **LOG_LEVEL** - Set logging verbosity (debug/info/warn/error)
-> - [ ] **Skip** - Use defaults
+> | Variable | Default | Description |
+> |----------|---------|-------------|
+> | {VAR} | {default} | {description} |
 >
-> (Select what you'd like to configure)
+> Would you like to customize any of these?
+> - Yes, let me set some
+> - No, use defaults
 
-**GATE**: If user wants to configure, update `.env.local` accordingly.
+**GATE**: Collect values and create/update env file.
+
+### 6.3 Create Environment File
+
+Based on collected values, create the appropriate env file (`.env.local` or `.env`).
 
 ---
 
-## Phase 4: DATABASE - Setup (if configured)
+## Phase 7: DATABASE - Setup (if applicable)
 
-### 4.1 Check Database Connection
+**Only if project has database configuration:**
 
-**Only if DATABASE_URL is configured:**
+### 7.1 Detect Database Setup Method
 
 ```bash
-# Test database connection by running type check (will fail if schema can't connect)
-npx tsc --noEmit 2>&1 | head -20
+# Drizzle
+ls drizzle.config.* 2>/dev/null && echo "DRIZZLE"
+
+# Prisma
+ls prisma/schema.prisma 2>/dev/null && echo "PRISMA"
+
+# Other
+ls migrations/ 2>/dev/null && echo "MIGRATIONS_DIR"
 ```
 
-### 4.2 Run Migrations (Optional)
-
-**Ask the user:**
+### 7.2 Offer Database Setup
 
 > **Database Setup**
 >
-> Would you like to push the database schema to Supabase?
+> This project uses {Drizzle/Prisma/etc.} for database management.
 >
-> ⚠️ This will create/update tables in your database.
+> Available actions:
+> - Push schema to database
+> - Run migrations
+> - Skip (I'll do it manually)
 >
-> - Yes, push schema now
-> - No, I'll do it later
-
-**If "Yes":**
-
-```bash
-bun run db:push
-```
-
-### 4.3 Setup Auth Trigger
-
-**Inform the user:**
-
-> **Important**: For user authentication to work, you need to run this SQL in your Supabase Dashboard → SQL Editor:
+> ⚠️ This will modify your database.
 >
-> ```sql
-> -- Function to sync auth.users to public.users
-> CREATE OR REPLACE FUNCTION public.handle_new_user()
-> RETURNS trigger AS $$
-> BEGIN
->   INSERT INTO public.users (id, email)
->   VALUES (NEW.id, NEW.email);
->   RETURN NEW;
-> END;
-> $$ LANGUAGE plpgsql SECURITY DEFINER;
+> What would you like to do?
+
+**GATE**: Execute based on user choice.
+
+### 7.3 Additional Database Steps
+
+If there are additional setup steps (like auth triggers, seeds), inform the user:
+
+> **Additional Setup Required**
 >
-> -- Trigger on auth.users insert
-> CREATE OR REPLACE TRIGGER on_auth_user_created
->   AFTER INSERT ON auth.users
->   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-> ```
->
-> Have you run this SQL, or would you like me to remind you later?
+> {Explain what needs to be done manually and why}
 
 ---
 
-## Phase 5: VALIDATE - Check Setup
+## Phase 8: VALIDATE - Check Setup
 
-### 5.1 Run Validation
+Run validation commands discovered in package.json:
 
 ```bash
-# Type check
-npx tsc --noEmit
+# Type check (if TypeScript)
+{typecheck_command}
 
-# Lint check
-bun run lint
+# Lint (if configured)
+{lint_command}
+
+# Test (optionally)
+{test_command}
 ```
 
-**Report any errors and suggest fixes.**
+**Report results and suggest fixes for any errors.**
 
 ---
 
-## Phase 6: START - Run Development Server
-
-### 6.1 Start Server
+## Phase 9: START - Run Development Server
 
 ```bash
-# Start dev server in background
-bun run dev &
-
-# Wait for server to start
-sleep 3
-
-# Check if running
-curl -s http://localhost:3000 > /dev/null && echo "SERVER_RUNNING" || echo "SERVER_FAILED"
+{dev_command}
 ```
 
-### 6.2 Verify Server
-
-```bash
-# Get server status
-lsof -i :3000 | grep LISTEN
-```
+Wait for server to start and verify it's running.
 
 ---
 
-## Phase 7: REPORT - Summary
+## Phase 10: REPORT - Summary
 
-**Output to user:**
+**Output comprehensive summary:**
 
 ```markdown
-## 🚀 Quickstart Complete
+## Quickstart Complete
+
+### Project Info
+- **Framework**: {detected framework}
+- **Package Manager**: {detected pm}
+- **Database**: {detected db or "None"}
 
 ### What Was Done
 
-- [x] Dependencies installed via `bun install`
-- [x] Environment configured in `.env.local`
-- [x] Database schema pushed (if selected)
-- [x] Validation checks passed
-- [x] Development server started
+- [x] Dependencies installed
+- [x] Environment configured ({N} variables set)
+- [x] Database: {pushed/migrated/skipped}
+- [x] Validation: {passed/failed with notes}
+- [x] Server started
 
 ### Access Points
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:3000 |
-| Supabase Dashboard | {SUPABASE_URL} |
+| App | {detected URL, e.g., http://localhost:3000} |
 
-### Configuration Summary
+### Environment Summary
 
-| Setting | Value |
-|---------|-------|
-| Supabase URL | `{masked_url}` |
-| Database | Connected / Not configured |
-| Log Level | {LOG_LEVEL} |
-
-### Next Steps
-
-1. **Open the app**: http://localhost:3000
-2. **Register a user**: Click "Sign Up" to test auth
-3. **Check the dashboard**: Login to see protected routes
-4. **Start coding**: Edit `src/app/page.tsx` to see hot reload
+| Variable | Status |
+|----------|--------|
+| {VAR} | ✓ Configured / ⚠️ Using default / ✗ Missing |
 
 ### Useful Commands
 
+{Commands discovered from package.json scripts}
+
 | Command | Description |
 |---------|-------------|
-| `bun run dev` | Start dev server |
-| `bun run build` | Production build |
-| `bun run lint` | Check for lint errors |
-| `bun test` | Run tests |
-| `bun run db:studio` | Open Drizzle Studio |
+| `{cmd}` | {description} |
 
-### Issues?
+### Next Steps
 
-- **Port 3000 in use**: Kill the process with `lsof -ti:3000 | xargs kill`
-- **Database connection failed**: Check your DATABASE_URL in `.env.local`
-- **Auth not working**: Make sure you ran the SQL trigger in Supabase
+{Based on what was discovered - e.g., "Register a user", "Run migrations", etc.}
 
-Happy coding! 🎉
+### Issues Encountered
+
+{Any problems and their solutions, or "None"}
 ```
 
 ---
 
 ## Error Handling
 
-**If any step fails:**
+**If exploration reveals unexpected structure:**
+
+> I found some things I didn't expect:
+> - {unexpected finding}
+>
+> This might mean:
+> - {possible explanation}
+>
+> Should I proceed with best guess, or would you like to clarify?
+
+**If a step fails:**
 
 1. Report the specific error
-2. Suggest common fixes
-3. Ask if user wants to continue or abort
-4. Log the issue for the final report
-
-**Common Issues:**
-
-| Error | Likely Cause | Fix |
-|-------|--------------|-----|
-| `bun: command not found` | Bun not installed | `curl -fsSL https://bun.sh/install | bash` |
-| `ECONNREFUSED` on database | Wrong DATABASE_URL | Check connection string format |
-| `Invalid API key` | Wrong ANON_KEY | Copy fresh key from Supabase Dashboard |
-| Port 3000 in use | Another process | `lsof -ti:3000 | xargs kill` |
+2. Check if it's a known issue (search docs/README)
+3. Suggest fixes based on context
+4. Ask if user wants to continue or abort
